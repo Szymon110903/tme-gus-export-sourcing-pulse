@@ -18,3 +18,4 @@ docker compose up -d
 
 ## Atrybucja danych
 *Źródło danych: Główny Urząd Statystyczny – Dziedzinowe Bazy Wiedzy (`https://api-dbw.stat.gov.pl/`, licencja CC BY 4.0) oraz Narodowy Bank Polski (`https://api.nbp.pl/`).*
+

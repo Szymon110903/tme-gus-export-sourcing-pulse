@@ -15,3 +15,4 @@ dq:
 
 test:
 	pytest -v
+
