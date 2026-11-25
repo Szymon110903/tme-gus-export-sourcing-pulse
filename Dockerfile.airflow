@@ -1,0 +1,21 @@
+FROM apache/airflow:2.10.4-python3.12
+
+USER airflow
+
+RUN mkdir -p /opt/airflow/airflow_db
+
+# Install only runtime packages needed by our ETL DAGs, respecting Airflow 2.10 constraints
+# (prevents upgrading SQLAlchemy 1.4 -> 2.0 which breaks Airflow 2.10)
+RUN pip install --no-cache-dir \
+    --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.4/constraints-3.12.txt" \
+    httpx \
+    truststore \
+    tenacity \
+    python-dotenv \
+    PyYAML \
+    pydantic-settings \
+    boto3 \
+    pandas \
+    "psycopg[binary]"
+
+ENV PYTHONPATH=/opt/airflow

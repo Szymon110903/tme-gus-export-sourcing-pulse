@@ -1,7 +1,13 @@
-.PHONY: build init-db discover backfill build-marts dq run-analysis test shell
+.PHONY: build init-db discover backfill build-marts dq run-analysis test shell airflow-up airflow-down
 
 build:
 	docker compose build
+
+airflow-up:
+	docker compose --profile airflow up -d --build
+
+airflow-down:
+	docker compose --profile airflow down
 
 init-db:
 	docker compose run --rm etl python -m src.pipelines.init_db
