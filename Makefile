@@ -1,4 +1,4 @@
-.PHONY: build init-db discover backfill build-marts dq run-analysis test shell airflow-up airflow-down
+.PHONY: build init-db discover backfill build-marts dq run-analysis notify test shell airflow-up airflow-down
 
 build:
 	docker compose build
@@ -28,6 +28,9 @@ dq:
 run-analysis:
 	docker compose run --rm etl python -m src.analytics.models_fx_granger
 	docker compose run --rm etl python -m src.analytics.generate_report
+
+notify:
+	docker compose run --rm etl python -m src.alerting.notify_power_automate --dry-run
 
 test:
 	docker compose run --rm etl pytest -v
