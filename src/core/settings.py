@@ -8,11 +8,12 @@ import yaml
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CONFIG_PATH = PROJECT_ROOT / "config" / "trade_series_config.yml"
 SQL_DIR = PROJECT_ROOT / "sql"
 DOCS_DIR = PROJECT_ROOT / "docs"
 REPORTS_DIR = PROJECT_ROOT / "reports"
+DATA_QUALITY_DIR = PROJECT_ROOT / "data_quality"
 
 
 class Settings(BaseSettings):

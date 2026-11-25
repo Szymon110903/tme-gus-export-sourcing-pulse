@@ -15,18 +15,19 @@ cp .env.example .env            # uzupełnij DATABASE_URL oraz klucze S3 z Supab
 docker compose build            # buduje obraz Python 3.12 z wszystkimi zależnościami
 
 # Krok 1: Inicjalizacja schematów w Supabase PostgreSQL 16 + test połączenia z S3
-docker compose run --rm etl python -m src.db_init
+docker compose run --rm etl python -m src.pipelines.init_db
 
 # Krok 2: Synchronizacja słowników GUS i wygenerowanie katalogu metadanych
-docker compose run --rm etl python -m src.sync_dictionaries
-docker compose run --rm etl python -m src.discover_metadata
+docker compose run --rm etl python -m src.pipelines.sync_dictionaries
+docker compose run --rm etl python -m src.pipelines.discover_metadata
 
 # Krok 3: Pobranie historii 2019-2026 (Bronze S3 -> Silver -> Gold)
-docker compose run --rm etl python -m src.extract_trade --backfill
+docker compose run --rm etl python -m src.pipelines.extract_trade --backfill
+docker compose run --rm etl python -m src.pipelines.build_marts
 
 # Krok 4: Analiza statystyczna, raport HTML/XLSX i testy
-docker compose run --rm etl python -m src.models_fx_granger
-docker compose run --rm etl python -m src.generate_report
+docker compose run --rm etl python -m src.analytics.models_fx_granger
+docker compose run --rm etl python -m src.analytics.generate_report
 docker compose run --rm etl pytest -v
 ```
 

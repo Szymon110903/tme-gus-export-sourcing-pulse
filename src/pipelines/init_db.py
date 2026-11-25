@@ -5,10 +5,9 @@ from __future__ import annotations
 import sys
 from urllib.parse import urlparse
 
-import psycopg
-
-from src.settings import SQL_DIR, get_settings
-from src.storage_s3 import BronzeStorageClient
+from src.core.db import execute_sql_file, get_pg_connection
+from src.core.settings import get_settings
+from src.core.storage_s3 import BronzeStorageClient
 
 INIT_SQL_FILES = [
     "00_schemas_and_dicts.sql",
@@ -23,17 +22,17 @@ def run_db_init() -> None:
 
     parsed = urlparse(settings.psycopg_dsn)
     print(f"[1/2] Connecting to Supabase PostgreSQL at {parsed.hostname}:{parsed.port or 5432}...")
-    with psycopg.connect(settings.psycopg_dsn, autocommit=True) as conn:
+    with get_pg_connection(settings, autocommit=True) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT version();")
             pg_version = cur.fetchone()[0]
             print(f"      Connected: {pg_version.split(',')[0]}")
 
-            for filename in INIT_SQL_FILES:
-                sql_path = SQL_DIR / filename
-                print(f"      Executing {filename}...")
-                cur.execute(sql_path.read_text(encoding="utf-8"))
+        for filename in INIT_SQL_FILES:
+            print(f"      Executing {filename}...")
+            execute_sql_file(conn, filename)
 
+        with conn.cursor() as cur:
             cur.execute("SELECT COUNT(*) FROM ref.dim_date;")
             date_rows = cur.fetchone()[0]
             print(f"      Verified ref.dim_date rows: {date_rows}")

@@ -1,24 +1,27 @@
-.PHONY: build init-db discover backfill run-analysis test dq shell
+.PHONY: build init-db discover backfill build-marts dq run-analysis test shell
 
 build:
 	docker compose build
 
 init-db:
-	docker compose run --rm etl python -m src.db_init
+	docker compose run --rm etl python -m src.pipelines.init_db
 
 discover:
-	docker compose run --rm etl python -m src.sync_dictionaries
-	docker compose run --rm etl python -m src.discover_metadata
+	docker compose run --rm etl python -m src.pipelines.sync_dictionaries
+	docker compose run --rm etl python -m src.pipelines.discover_metadata
 
 backfill:
-	docker compose run --rm etl python -m src.extract_trade --backfill
+	docker compose run --rm etl python -m src.pipelines.extract_trade --backfill
 
-run-analysis:
-	docker compose run --rm etl python -m src.models_fx_granger
-	docker compose run --rm etl python -m src.generate_report
+build-marts:
+	docker compose run --rm etl python -m src.pipelines.build_marts
 
 dq:
-	docker compose run --rm etl python -m src.run_dq
+	docker compose run --rm etl python -m src.quality.run_dq
+
+run-analysis:
+	docker compose run --rm etl python -m src.analytics.models_fx_granger
+	docker compose run --rm etl python -m src.analytics.generate_report
 
 test:
 	docker compose run --rm etl pytest -v

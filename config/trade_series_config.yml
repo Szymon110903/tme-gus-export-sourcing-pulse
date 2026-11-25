@@ -4,7 +4,7 @@
 # Identyfikatory okresów (id-okres) NIE są wpisywane na sztywno – są rozwiązywane
 # dynamicznie ze słownika /dictionaries/periods-dictionary (tabela ref.dim_period)
 # i weryfikowane przez /variable/variable-section-periods.
-# Katalog zweryfikowanych ID generuje skrypt: python -m src.discover_metadata
+# Katalog zweryfikowanych ID generuje skrypt: python -m src.pipelines.discover_metadata
 
 date_range:
   start_year: 2019

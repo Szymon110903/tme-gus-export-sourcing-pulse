@@ -11,7 +11,7 @@ import boto3
 from botocore.config import Config
 from botocore.exceptions import ClientError
 
-from src.settings import Settings, get_settings
+from src.core.settings import Settings, get_settings
 
 
 class BronzeStorageClient:
