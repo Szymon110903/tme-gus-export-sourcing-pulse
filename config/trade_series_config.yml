@@ -1,0 +1,160 @@
+# Zweryfikowana konfiguracja szeregów API DBW GUS (https://api-dbw.stat.gov.pl/api/1.1.0/)
+# Licencja danych: CC BY 4.0 (Główny Urząd Statystyczny)
+
+date_range:
+  start_year: 2019
+  end_year: 2026
+  monthly_period_ids: [247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258]
+  cumulative_period_ids: [247, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269]
+
+dbw_datasets:
+  - code: PRICE_IMP_EXP_PKWIU
+    description: "Wskaźniki cen importu i eksportu wg PKWiU (działy 26, 27, 28)"
+    id_zmienna: 329
+    id_przekroj: 772
+    period_mode: monthly
+    positions:
+      direction_dim2:
+        4768413: IMPORT
+        4768414: EXPORT
+      pkwiu_dim3:
+        5665591: PKWiU_26_ELEKTRONIKA
+        5665642: PKWiU_27_ELEKTRYKA
+        5665823: PKWiU_28_MASZYNY
+        7124459: PKWiU_05_32_OGOLEM
+    measures:
+      5: YOY_100
+      2: MOM_100
+
+  - code: VOL_EXP_SITC7
+    description: "Wskaźnik wolumenu w eksporcie – Sekcja SITC 7 (Maszyny i urządzenia)"
+    id_zmienna: 227
+    id_przekroj: 789
+    period_mode: monthly
+    positions:
+      market_dim2:
+        4768396: TOTAL
+        4768398: EU
+        4768400: CEE
+      sitc_dim3:
+        720160: SITC_7_MACHINERY_EQUIPMENT
+        6618001: SITC_TOTAL
+    measures:
+      5: YOY_100_CONST
+
+  - code: VOL_IMP_SITC7
+    description: "Wskaźnik wolumenu w imporcie – Sekcja SITC 7 (Maszyny i urządzenia)"
+    id_zmienna: 228
+    id_przekroj: 789
+    period_mode: monthly
+    positions:
+      market_dim2:
+        4768396: TOTAL
+        4768398: EU
+        4768400: CEE
+      sitc_dim3:
+        720160: SITC_7_MACHINERY_EQUIPMENT
+        6618001: SITC_TOTAL
+    measures:
+      5: YOY_100_CONST
+
+  - code: TOT_SITC7
+    description: "Wskaźniki cen transakcyjnych i Terms of Trade – Sekcja SITC 7"
+    id_zmienna: 328
+    id_przekroj: 773
+    period_mode: cumulative
+    positions:
+      direction_dim2:
+        4768413: IMPORT
+        4768414: EXPORT
+        4768415: TERMS_OF_TRADE
+      market_dim3:
+        4768396: TOTAL
+        4768398: EU
+        4768400: CEE
+      sitc_dim4:
+        720160: SITC_7_MACHINERY_EQUIPMENT
+
+  - code: EXPORT_GROUPS
+    description: "Eksport towarów wg ugrupowań (PLN, EUR, USD, kg, udział %)"
+    id_zmienna: 220
+    id_przekroj: 1144
+    period_mode: monthly
+    positions:
+      group_dim2:
+        7556586: EU
+        7557142: EUROZONE
+        7276959: CEE
+        7557771: DEVELOPING_ASIA_LATAM
+        7557722: DEVELOPED
+    measures:
+      180: VALUE_PLN
+      314: VALUE_EUR
+      315: VALUE_USD
+      277: MASS_KG
+      99: SHARE_PCT
+      6: YOY_PLN_100
+
+  - code: IMPORT_ORIGIN_GROUPS
+    description: "Import towarów wg kraju pochodzenia i ugrupowań"
+    id_zmienna: 221
+    id_przekroj: 1144
+    period_mode: monthly
+    positions:
+      group_dim2:
+        7556586: EU
+        7557142: EUROZONE
+        7276959: CEE
+        7557771: DEVELOPING_ASIA_LATAM
+        7557722: DEVELOPED
+    measures:
+      180: VALUE_PLN
+      314: VALUE_EUR
+      315: VALUE_USD
+      277: MASS_KG
+      99: SHARE_PCT
+      6: YOY_PLN_100
+
+  - code: IMPORT_CONSIGNMENT_GROUPS
+    description: "Import towarów wg kraju wysyłki i ugrupowań"
+    id_zmienna: 222
+    id_przekroj: 1144
+    period_mode: monthly
+    positions:
+      group_dim2:
+        7556586: EU
+        7557142: EUROZONE
+        7276959: CEE
+        7557771: DEVELOPING_ASIA_LATAM
+        7557722: DEVELOPED
+    measures:
+      180: VALUE_PLN
+      314: VALUE_EUR
+      315: VALUE_USD
+      277: MASS_KG
+      99: SHARE_PCT
+      6: YOY_PLN_100
+
+  - code: NEW_ORDERS_FOREIGN
+    description: "Nowe zamówienia w przemyśle – ogółem i niekrajowe (eksportowe)"
+    id_zmienna: 815
+    id_przekroj: 828
+    period_mode: monthly
+    positions:
+      order_type_dim2:
+        7232806: TOTAL
+        7232807: FOREIGN_EXPORT
+    measures:
+      6: YOY_100
+      3: MOM_100
+      357: BASE_2021_100
+
+nbp_currencies:
+  - USD
+  - EUR
+
+alert_thresholds:
+  margin_squeeze_tot_lt: 97.5
+  margin_tailwind_tot_gt: 102.0
+  fx_consistency_tolerance_pct: 5.0
+  revision_audit_diff_pct: 3.0
