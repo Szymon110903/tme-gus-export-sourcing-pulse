@@ -1,6 +1,6 @@
 # Katalog metadanych GUS DBW (wygenerowany automatycznie)
 
-> **Ostatnia weryfikacja względem API DBW GUS:** `2026-11-25 14:59 UTC`  
+> **Ostatnia weryfikacja względem API DBW GUS:** `2026-11-25 15:46 UTC`  
 > **Źródłowy adres bazowy:** `https://api-dbw.stat.gov.pl/api/1.1.0`  
 > **Skrypt generujący:** `python -m src.pipelines.discover_metadata` (na podstawie tabel `ref.*` w Supabase PostgreSQL 16).
 
@@ -13,29 +13,17 @@ Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora uży
 | `id_okres` | Symbol | Typ okresu | Miesiąc (`month_num`) | Tryb | Oficjalny opis GUS |
 |---:|---|---|---:|---|---|
 | `247` | `M01` | dane miesięczne | 1 | `monthly` | miesiąc - dane miesięczne - styczeń |
-| `341` | `M01` | dane miesięczne | 1 | `monthly` | kwartał - dane miesięczne - styczeń |
 | `248` | `M02` | dane miesięczne | 2 | `monthly` | miesiąc - dane miesięczne - luty |
 | `249` | `M03` | dane miesięczne | 3 | `monthly` | miesiąc - dane miesięczne - marzec |
-| `328` | `M03` | dane miesięczne | 3 | `monthly` | rok - dane miesięczne - marzec |
-| `332` | `M03` | dane miesięczne | 3 | `monthly` | kwartał - dane miesięczne - marzec |
 | `250` | `M04` | dane miesięczne | 4 | `monthly` | miesiąc - dane miesięczne - kwiecień |
-| `342` | `M04` | dane miesięczne | 4 | `monthly` | kwartał - dane miesięczne - kwiecień |
 | `251` | `M05` | dane miesięczne | 5 | `monthly` | miesiąc - dane miesięczne - maj |
 | `252` | `M06` | dane miesięczne | 6 | `monthly` | miesiąc - dane miesięczne - czerwiec |
-| `333` | `M06` | dane miesięczne | 6 | `monthly` | kwartał - dane miesięczne - czerwiec |
 | `253` | `M07` | dane miesięczne | 7 | `monthly` | miesiąc - dane miesięczne - lipiec |
-| `343` | `M07` | dane miesięczne | 7 | `monthly` | kwartał - dane miesięczne - lipiec |
 | `254` | `M08` | dane miesięczne | 8 | `monthly` | miesiąc - dane miesięczne - sierpień |
 | `255` | `M09` | dane miesięczne | 9 | `monthly` | miesiąc - dane miesięczne - wrzesień |
-| `334` | `M09` | dane miesięczne | 9 | `monthly` | kwartał - dane miesięczne - wrzesień |
 | `256` | `M10` | dane miesięczne | 10 | `monthly` | miesiąc - dane miesięczne - październik |
-| `324` | `M10` | dane miesięczne | 10 | `monthly` | co dwa lata - dane miesięczne - październik |
-| `329` | `M10` | dane miesięczne | 10 | `monthly` | rok - dane miesięczne - październik |
-| `344` | `M10` | dane miesięczne | 10 | `monthly` | kwartał - dane miesięczne - październik |
 | `257` | `M11` | dane miesięczne | 11 | `monthly` | miesiąc - dane miesięczne - listopad |
 | `258` | `M12` | dane miesięczne | 12 | `monthly` | miesiąc - dane miesięczne - grudzień |
-| `335` | `M12` | dane miesięczne | 12 | `monthly` | kwartał - dane miesięczne - grudzień |
-| `340` | `M01-01` | dane narastające | 1 | `cumulative` | miesiąc - dane narastające - styczeń |
 | `259` | `M01-02` | dane narastające | 2 | `cumulative` | miesiąc - dane narastające - styczeń - luty |
 | `260` | `M01-03` | dane narastające | 3 | `cumulative` | miesiąc - dane narastające - styczeń - marzec |
 | `261` | `M01-04` | dane narastające | 4 | `cumulative` | miesiąc - dane narastające - styczeń - kwiecień |

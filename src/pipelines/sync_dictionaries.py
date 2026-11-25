@@ -18,10 +18,18 @@ ROMAN_MONTHS = {
 
 
 def parse_period_flags(item: dict[str, Any]) -> tuple[int | None, bool, bool]:
-    """Derive (month_num, is_monthly, is_cumulative) from official DBW period metadata."""
+    """Derive (month_num, is_monthly, is_cumulative) from official DBW period metadata.
+
+    Strictly filters to monthly frequency (nazwa-czestotliwosc == 'Miesiąc') so
+    quarterly/annual variants sharing M01..M12 symbols (e.g. id-okres=341) are excluded.
+    """
     symbol = str(item.get("symbol") or "").strip().upper()
     opis = str(item.get("opis") or "").strip()
     nazwa_typ = str(item.get("nazwa-typ") or "").strip().lower()
+    nazwa_czest = str(item.get("nazwa-czestotliwosc") or "").strip().lower()
+
+    if nazwa_czest != "miesiąc":
+        return None, False, False
 
     m_single = re.fullmatch(r"M(\d{2})", symbol)
     if m_single and "miesi" in nazwa_typ:
@@ -32,13 +40,13 @@ def parse_period_flags(item: dict[str, Any]) -> tuple[int | None, bool, bool]:
     if "narastaj" in nazwa_typ or "narastaj" in opis.lower():
         m_cum_sym = re.search(r"M01-(\d{2})", symbol)
         if m_cum_sym:
-            return int(m_cum_sym.group(1)), False, True
+            m_end = int(m_cum_sym.group(1))
+            # Month 1 uses id_okres=247 (M01); cumulative series use M01-02..M01-12 (259..269)
+            if 2 <= m_end <= 12:
+                return m_end, False, True
         m_cum_rom = re.search(r"\bI\s*[-–]\s*(XII|XI|X|IX|VIII|VII|VI|V|IV|III|II)\b", opis.upper())
         if m_cum_rom:
             return ROMAN_MONTHS[m_cum_rom.group(1)], False, True
-        id_okres = int(item.get("id-okres") or 0)
-        if 259 <= id_okres <= 269:
-            return id_okres - 257, False, True
 
     return None, False, False
 
