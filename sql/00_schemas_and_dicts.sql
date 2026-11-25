@@ -11,8 +11,12 @@ CREATE TABLE IF NOT EXISTS ref.dim_variable (
     id_obszaru         int,
     nazwa_zmienna      text         NOT NULL,
     obszar_tematyczny  text,
+    business_code      varchar(64),
+    id_przekroj        int,
     updated_at         timestamptz  NOT NULL DEFAULT now()
 );
+ALTER TABLE ref.dim_variable ADD COLUMN IF NOT EXISTS business_code varchar(64);
+ALTER TABLE ref.dim_variable ADD COLUMN IF NOT EXISTS id_przekroj int;
 
 -- 2. Wymiar okresów GUS DBW (rozwiązywany dynamicznie z /dictionaries/periods-dictionary)
 CREATE TABLE IF NOT EXISTS ref.dim_period (
@@ -48,8 +52,10 @@ CREATE TABLE IF NOT EXISTS ref.dim_measure (
     sposob_prezentacji text,
     oznaczenie_jedn    varchar(64),
     nazwa_jedn         varchar(128),
+    business_code      varchar(64),
     updated_at         timestamptz  NOT NULL DEFAULT now()
 );
+ALTER TABLE ref.dim_measure ADD COLUMN IF NOT EXISTS business_code varchar(64);
 
 -- 5. Wymiar flag jakości i rewizji GUS DBW (np. 31 = dane wstępne, 32 = dane skorygowane)
 CREATE TABLE IF NOT EXISTS ref.dim_flag (

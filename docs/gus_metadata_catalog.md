@@ -1,10 +1,10 @@
 # Katalog metadanych GUS DBW (wygenerowany automatycznie)
 
-> **Ostatnia weryfikacja względem API DBW GUS:** `2026-11-25 15:46 UTC`  
+> **Ostatnia weryfikacja względem API DBW GUS:** `2026-11-25 17:35 UTC`  
 > **Źródłowy adres bazowy:** `https://api-dbw.stat.gov.pl/api/1.1.0`  
 > **Skrypt generujący:** `python -m src.pipelines.discover_metadata` (na podstawie tabel `ref.*` w Supabase PostgreSQL 16).
 
-Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora użytego w `config/trade_series_config.yml`.
+Ten dokument stanowi o pochodzenia każdego identyfikatora użytego w `config/trade_series_config.yml`.
 
 ---
 
@@ -66,7 +66,7 @@ Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora uży
 | Pozycja (`market_dim2`) | `4768400` | `CEE` | Kraje: kraje Europy Środkowo-Wschodniej |
 | Pozycja (`sitc_dim3`) | `720160` | `SITC_7_MACHINERY_EQUIPMENT` | Sekcja SITC: 7 - Maszyny, urządzenia i sprzęt transportowy |
 | Pozycja (`sitc_dim3`) | `6618001` | `SITC_TOTAL` | Sekcja SITC: GR272102 - Ogółem |
-| Miara | `5` | `YOY_100_CONST` | analogiczny okres roku poprzedniego=100 [-] [bezwymiarowy] |
+| Miara | `5` | `YOY_100` | analogiczny okres roku poprzedniego=100 [-] [bezwymiarowy] |
 
 ### `VOL_IMP_SITC7` — Wskaźnik wolumenu w obrotach handlu zagranicznego w imporcie
 - **Obszar GUS:** Obroty towarowe · **`id_zmienna`:** `228` · **`id_przekroj`:** `789` · **Tryb okresów:** `monthly`
@@ -79,7 +79,7 @@ Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora uży
 | Pozycja (`market_dim2`) | `4768400` | `CEE` | Kraje: kraje Europy Środkowo-Wschodniej |
 | Pozycja (`sitc_dim3`) | `720160` | `SITC_7_MACHINERY_EQUIPMENT` | Sekcja SITC: 7 - Maszyny, urządzenia i sprzęt transportowy |
 | Pozycja (`sitc_dim3`) | `6618001` | `SITC_TOTAL` | Sekcja SITC: GR272102 - Ogółem |
-| Miara | `5` | `YOY_100_CONST` | analogiczny okres roku poprzedniego=100 [-] [bezwymiarowy] |
+| Miara | `5` | `YOY_100` | analogiczny okres roku poprzedniego=100 [-] [bezwymiarowy] |
 
 ### `TOT_SITC7` — Wskaźniki cen transakcyjnych w handlu zagranicznym
 - **Obszar GUS:** Ceny w handlu zagranicznym · **`id_zmienna`:** `328` · **`id_przekroj`:** `773` · **Tryb okresów:** `cumulative`
@@ -111,7 +111,7 @@ Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora uży
 | Miara | `315` | `VALUE_USD` | [USD] [USD] |
 | Miara | `277` | `MASS_KG` | [kg] [kg] |
 | Miara | `99` | `SHARE_PCT` | udział w pozycji ogółem [%] [%] |
-| Miara | `6` | `YOY_PLN_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
+| Miara | `6` | `YOY_CURR_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
 
 ### `IMPORT_ORIGIN_GROUPS` — Import towarów wg kraju pochodzenia
 - **Obszar GUS:** Obroty towarowe · **`id_zmienna`:** `221` · **`id_przekroj`:** `1144` · **Tryb okresów:** `monthly`
@@ -129,7 +129,7 @@ Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora uży
 | Miara | `315` | `VALUE_USD` | [USD] [USD] |
 | Miara | `277` | `MASS_KG` | [kg] [kg] |
 | Miara | `99` | `SHARE_PCT` | udział w pozycji ogółem [%] [%] |
-| Miara | `6` | `YOY_PLN_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
+| Miara | `6` | `YOY_CURR_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
 
 ### `IMPORT_CONSIGNMENT_GROUPS` — Import towarów wg kraju wysyłki
 - **Obszar GUS:** Obroty towarowe · **`id_zmienna`:** `222` · **`id_przekroj`:** `1144` · **Tryb okresów:** `monthly`
@@ -147,7 +147,7 @@ Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora uży
 | Miara | `315` | `VALUE_USD` | [USD] [USD] |
 | Miara | `277` | `MASS_KG` | [kg] [kg] |
 | Miara | `99` | `SHARE_PCT` | udział w pozycji ogółem [%] [%] |
-| Miara | `6` | `YOY_PLN_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
+| Miara | `6` | `YOY_CURR_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
 
 ### `NEW_ORDERS_FOREIGN` — Nowe zamówienia w przemyśle
 - **Obszar GUS:** Przemysł · **`id_zmienna`:** `815` · **`id_przekroj`:** `828` · **Tryb okresów:** `monthly`
@@ -157,6 +157,6 @@ Ten dokument stanowi audytowalny dowód pochodzenia każdego identyfikatora uży
 |---|---:|---|---|
 | Pozycja (`order_type_dim2`) | `7232806` | `TOTAL` | Rodzaje nowych zamówień w przemyśle: Ogółem |
 | Pozycja (`order_type_dim2`) | `7232807` | `FOREIGN_EXPORT` | Rodzaje nowych zamówień w przemyśle: Niekrajowe |
-| Miara | `6` | `YOY_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
-| Miara | `3` | `MOM_100` | okres poprzedni=100  [-] [bezwymiarowy] |
+| Miara | `6` | `YOY_CURR_100` | analogiczny okres roku poprzedniego=100  [-] [bezwymiarowy] |
+| Miara | `3` | `MOM_CURR_100` | okres poprzedni=100  [-] [bezwymiarowy] |
 | Miara | `357` | `BASE_2021_100` | przeciętna miesięczna 2021=100 ceny stałe [-] [bezwymiarowy] |

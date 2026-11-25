@@ -52,7 +52,7 @@ dbw_datasets:
         720160: SITC_7_MACHINERY_EQUIPMENT
         6618001: SITC_TOTAL
     measures:
-      5: YOY_100_CONST
+      5: YOY_100
 
   - code: VOL_IMP_SITC7
     description: "Wskaźnik wolumenu w imporcie – Sekcja SITC 7 (Maszyny i urządzenia)"
@@ -68,7 +68,7 @@ dbw_datasets:
         720160: SITC_7_MACHINERY_EQUIPMENT
         6618001: SITC_TOTAL
     measures:
-      5: YOY_100_CONST
+      5: YOY_100
 
   - code: TOT_SITC7
     description: "Wskaźniki cen transakcyjnych i Terms of Trade – Sekcja SITC 7"
@@ -105,7 +105,7 @@ dbw_datasets:
       315: VALUE_USD
       277: MASS_KG
       99: SHARE_PCT
-      6: YOY_PLN_100
+      6: YOY_CURR_100
 
   - code: IMPORT_ORIGIN_GROUPS
     description: "Import towarów wg kraju pochodzenia i ugrupowań"
@@ -125,7 +125,7 @@ dbw_datasets:
       315: VALUE_USD
       277: MASS_KG
       99: SHARE_PCT
-      6: YOY_PLN_100
+      6: YOY_CURR_100
 
   - code: IMPORT_CONSIGNMENT_GROUPS
     description: "Import towarów wg kraju wysyłki i ugrupowań"
@@ -145,7 +145,7 @@ dbw_datasets:
       315: VALUE_USD
       277: MASS_KG
       99: SHARE_PCT
-      6: YOY_PLN_100
+      6: YOY_CURR_100
 
   - code: NEW_ORDERS_FOREIGN
     description: "Nowe zamówienia w przemyśle – ogółem i niekrajowe (eksportowe)"
@@ -157,8 +157,8 @@ dbw_datasets:
         7232806: TOTAL
         7232807: FOREIGN_EXPORT
     measures:
-      6: YOY_100
-      3: MOM_100
+      6: YOY_CURR_100
+      3: MOM_CURR_100
       357: BASE_2021_100
 
 nbp_currencies:

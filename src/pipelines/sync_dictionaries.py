@@ -51,22 +51,60 @@ def parse_period_flags(item: dict[str, Any]) -> tuple[int | None, bool, bool]:
     return None, False, False
 
 
-def build_position_business_map(config: dict[str, Any]) -> dict[tuple[int, int], str]:
-    """Build (id_przekroj, id_pozycja) -> business_code lookup from YAML config."""
-    mapping: dict[tuple[int, int], str] = {}
+def build_business_code_maps(
+    config: dict[str, Any],
+) -> tuple[dict[int, tuple[str, int]], dict[int, str], dict[tuple[int, int], str]]:
+    """Build business_code lookups from YAML for variables, measures, and positions."""
+    var_map: dict[int, tuple[str, int]] = {}
+    measure_map: dict[int, str] = {}
+    pos_map: dict[tuple[int, int], str] = {}
     for ds in config.get("dbw_datasets", []):
+        var_id = int(ds["id_zmienna"])
         sec_id = int(ds["id_przekroj"])
+        var_map[var_id] = (str(ds["code"]), sec_id)
+        for m_id, m_code in (ds.get("measures") or {}).items():
+            measure_map[int(m_id)] = str(m_code)
         for _dim_group, pos_dict in (ds.get("positions") or {}).items():
             for pos_id, biz_code in pos_dict.items():
-                mapping[(sec_id, int(pos_id))] = str(biz_code)
-    return mapping
+                pos_map[(sec_id, int(pos_id))] = str(biz_code)
+    return var_map, measure_map, pos_map
+
+
+def sync_business_codes_only() -> None:
+    """Apply business_code labels from YAML onto existing ref.* rows (0 GUS API calls)."""
+    settings = get_settings()
+    config = load_trade_config()
+    var_biz_map, measure_biz_map, pos_biz_map = build_business_code_maps(config)
+
+    with get_pg_connection(settings) as conn:
+        with conn.cursor() as cur:
+            for var_id, (biz_code, sec_id) in var_biz_map.items():
+                cur.execute(
+                    "UPDATE ref.dim_variable SET business_code = %s, id_przekroj = %s, updated_at = now() WHERE id_zmienna = %s",
+                    (biz_code, sec_id, var_id),
+                )
+            for m_id, m_code in measure_biz_map.items():
+                cur.execute(
+                    "UPDATE ref.dim_measure SET business_code = %s, updated_at = now() WHERE id_miara = %s",
+                    (m_code, m_id),
+                )
+            for (sec_id, pos_id), p_code in pos_biz_map.items():
+                cur.execute(
+                    "UPDATE ref.dim_position SET business_code = %s, updated_at = now() WHERE id_przekroj = %s AND id_pozycja = %s",
+                    (p_code, sec_id, pos_id),
+                )
+        conn.commit()
+    print(
+        f"OK: Applied business_code mappings to ref.* "
+        f"(variables={len(var_biz_map)}, measures={len(measure_biz_map)}, positions={len(pos_biz_map)})."
+    )
 
 
 def sync_all_dictionaries() -> None:
     settings = get_settings()
     config = load_trade_config()
     storage = BronzeStorageClient(settings)
-    pos_biz_map = build_position_business_map(config)
+    var_biz_map, measure_biz_map, pos_biz_map = build_business_code_maps(config)
 
     target_vars = {int(ds["id_zmienna"]) for ds in config["dbw_datasets"]}
     target_sections = sorted({int(ds["id_przekroj"]) for ds in config["dbw_datasets"]})
@@ -116,25 +154,28 @@ def sync_all_dictionaries() -> None:
             measures = dbw.get_measures_dictionary()
             storage.put_json_gz(storage.dbw_dict_key("measures"), measures)
             for item in measures:
+                m_id = int(item["id-sposob-prezentacji-miara"])
                 cur.execute(
                     """
                     INSERT INTO ref.dim_measure (
-                        id_miara, nazwa_miary, sposob_prezentacji, oznaczenie_jedn, nazwa_jedn, updated_at
+                        id_miara, nazwa_miary, sposob_prezentacji, oznaczenie_jedn, nazwa_jedn, business_code, updated_at
                     )
-                    VALUES (%s, %s, %s, %s, %s, now())
+                    VALUES (%s, %s, %s, %s, %s, %s, now())
                     ON CONFLICT (id_miara) DO UPDATE SET
                         nazwa_miary = EXCLUDED.nazwa_miary,
                         sposob_prezentacji = EXCLUDED.sposob_prezentacji,
                         oznaczenie_jedn = EXCLUDED.oznaczenie_jedn,
                         nazwa_jedn = EXCLUDED.nazwa_jedn,
+                        business_code = COALESCE(EXCLUDED.business_code, ref.dim_measure.business_code),
                         updated_at = now()
                     """,
                     (
-                        int(item["id-sposob-prezentacji-miara"]),
+                        m_id,
                         item.get("nazwa") or "",
                         item.get("nazwa-sposob-prezentacji"),
                         item.get("oznaczenie-jednostki"),
                         item.get("nazwa-jednostki"),
+                        measure_biz_map.get(m_id),
                     ),
                 )
             print(f"      Upserted {len(measures)} rows into ref.dim_measure")
@@ -178,14 +219,19 @@ def sync_all_dictionaries() -> None:
                         )
             storage.put_json_gz(storage.dbw_dict_key("variables_configured"), var_rows)
             for row in var_rows:
+                biz_code, sec_id = var_biz_map.get(row["id_zmienna"], (None, None))
                 cur.execute(
                     """
-                    INSERT INTO ref.dim_variable (id_zmienna, id_obszaru, nazwa_zmienna, obszar_tematyczny, updated_at)
-                    VALUES (%s, %s, %s, %s, now())
+                    INSERT INTO ref.dim_variable (
+                        id_zmienna, id_obszaru, nazwa_zmienna, obszar_tematyczny, business_code, id_przekroj, updated_at
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, now())
                     ON CONFLICT (id_zmienna) DO UPDATE SET
                         id_obszaru = EXCLUDED.id_obszaru,
                         nazwa_zmienna = EXCLUDED.nazwa_zmienna,
                         obszar_tematyczny = EXCLUDED.obszar_tematyczny,
+                        business_code = COALESCE(EXCLUDED.business_code, ref.dim_variable.business_code),
+                        id_przekroj = COALESCE(EXCLUDED.id_przekroj, ref.dim_variable.id_przekroj),
                         updated_at = now()
                     """,
                     (
@@ -193,6 +239,8 @@ def sync_all_dictionaries() -> None:
                         row["id_obszaru"],
                         row["nazwa_zmienna"],
                         row["obszar_tematyczny"],
+                        biz_code,
+                        sec_id,
                     ),
                 )
             print(f"      Upserted {len(var_rows)} rows into ref.dim_variable")
@@ -233,8 +281,16 @@ def sync_all_dictionaries() -> None:
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Sync GUS DBW dictionaries into Supabase.")
+    parser.add_argument("--codes-only", action="store_true", help="Only update business_code labels from YAML (0 API calls).")
+    args = parser.parse_args()
     try:
-        sync_all_dictionaries()
+        if args.codes_only:
+            sync_business_codes_only()
+        else:
+            sync_all_dictionaries()
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         sys.exit(1)
