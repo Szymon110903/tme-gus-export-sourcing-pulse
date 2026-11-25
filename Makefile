@@ -1,18 +1,27 @@
-.PHONY: init-db backfill run-analysis test dq
+.PHONY: build init-db discover backfill run-analysis test dq shell
+
+build:
+	docker compose build
 
 init-db:
-	python -m src.db_init
+	docker compose run --rm etl python -m src.db_init
+
+discover:
+	docker compose run --rm etl python -m src.sync_dictionaries
+	docker compose run --rm etl python -m src.discover_metadata
 
 backfill:
-	python -m src.extract_trade --backfill
+	docker compose run --rm etl python -m src.extract_trade --backfill
 
 run-analysis:
-	python -m src.models_fx_granger
-	python -m src.generate_report
+	docker compose run --rm etl python -m src.models_fx_granger
+	docker compose run --rm etl python -m src.generate_report
 
 dq:
-	python -m src.run_dq
+	docker compose run --rm etl python -m src.run_dq
 
 test:
-	pytest -v
+	docker compose run --rm etl pytest -v
 
+shell:
+	docker compose run --rm etl bash

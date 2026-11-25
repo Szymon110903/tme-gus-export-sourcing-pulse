@@ -1,0 +1,14 @@
+.git
+.gitignore
+.env
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+reports/*.html
+reports/*.xlsx
+reports/*.png
+data_cache
+logs
+

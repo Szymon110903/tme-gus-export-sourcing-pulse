@@ -1,11 +1,23 @@
-# Zweryfikowana konfiguracja szeregów API DBW GUS (https://api-dbw.stat.gov.pl/api/1.1.0/)
+# Konfiguracja szeregów API DBW GUS (https://api-dbw.stat.gov.pl/api/1.1.0/)
 # Licencja danych: CC BY 4.0 (Główny Urząd Statystyczny)
+#
+# Identyfikatory okresów (id-okres) NIE są wpisywane na sztywno – są rozwiązywane
+# dynamicznie ze słownika /dictionaries/periods-dictionary (tabela ref.dim_period)
+# i weryfikowane przez /variable/variable-section-periods.
+# Katalog zweryfikowanych ID generuje skrypt: python -m src.discover_metadata
 
 date_range:
   start_year: 2019
   end_year: 2026
-  monthly_period_ids: [247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258]
-  cumulative_period_ids: [247, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269]
+  # Liczba ostatnich miesięcy odświeżanych ponownie w celu wychwycenia rewizji Intrastat
+  recheck_recent_months: 3
+  # Reguły rozwiązywania okresów w ref.dim_period
+  period_modes:
+    monthly:
+      nazwa_typ: "dane miesięczne"
+    cumulative:
+      nazwa_typ: "dane narastające"
+      include_january_monthly: true
 
 dbw_datasets:
   - code: PRICE_IMP_EXP_PKWIU
@@ -158,4 +170,3 @@ alert_thresholds:
   margin_tailwind_tot_gt: 102.0
   fx_consistency_tolerance_pct: 5.0
   revision_audit_diff_pct: 3.0
-
