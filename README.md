@@ -36,6 +36,7 @@ Na podstawie rzeczywistych danych GUS DBW i NBP załadowanych do warstwy Gold (`
 - Źródła danych, zawartość wszystkich zbiorów i interpretacja biznesowa: [docs/data_sources_and_dictionary.md](docs/data_sources_and_dictionary.md)
 - Model danych i architektura chmurowa (ERD + Medallion): [docs/data_model_and_cloud_storage.md](docs/data_model_and_cloud_storage.md)
 - Warstwa Gold (`mart.*`) i logika obliczeń (Silver → Gold): [docs/gold_layer_and_analytics.md](docs/gold_layer_and_analytics.md)
+- Przepływ wykonania w kodzie (DAG Airflow, moduły `src/`, DQ i odporność): [docs/pipeline_code_flow.md](docs/pipeline_code_flow.md)
 - Automatycznie zweryfikowany katalog metadanych GUS DBW: [docs/gus_metadata_catalog.md](docs/gus_metadata_catalog.md)
 - Mapowanie na **Power Automate, Power Apps i ekosystem SAP (Datasphere / SAC / AfO / SBPA)**: [docs/power_platform_sap_mapping.md](docs/power_platform_sap_mapping.md)
 
