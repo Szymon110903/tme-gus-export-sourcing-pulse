@@ -119,7 +119,7 @@ flowchart LR
     end
 
     subgraph CONS["Odbiorcy i Automatyzacja"]
-        BI["Raport HTML/XLSX / Power BI (docelowo SAP Analytics Cloud)"]
+        BI["Raport HTML (Plotly) / Power BI (docelowo SAP Analytics Cloud)"]
         AL["Power Automate + Power Apps (docelowo SAP BPA)"]
     end
 
@@ -157,8 +157,65 @@ flowchart LR
 |---|---|
 | **Supabase Storage (S3)** – warstwa `Bronze` | **Azure Data Lake Storage Gen2 / Azure Blob** |
 | **Supabase PostgreSQL 16** – warstwy `Silver` (`ref`, `staging`) i `Gold` (`mart`) | **SAP HANA / SAP Datasphere** |
-| **Raport HTML/XLSX / Power BI** | **SAP Analytics Cloud (SAC)** + **Analysis for Office** |
+| **Raport HTML (Plotly) / Power BI** | **SAP Analytics Cloud (SAC)** + **Analysis for Office** |
 | **Apache Airflow** | **Apache Airflow** |
 | **Microsoft Power Automate + Power Apps** | **Power Automate**, **Power Apps** oraz **SAP Build Process Automation** |
 
 ---
+
+## 4. Format danych i miary: Silver vs Gold
+
+### Rozdział odpowiedzialności między warstwami
+- **Bronze → Silver (`staging.fact_dbw_observation`):** normalizujemy strukturę, typy danych i kalendarz (`period_date`), ale **samych liczb z GUS nie przeliczamy**. Tabela ma **format długi (pionowy)** — dla jednego miesiąca i jednego kierunku występuje tyle wierszy, ile miar zwraca GUS (różnią się kolumną `id_miara` i `wartosc`). Dzięki temu jedna tabela bez zmian schematu obsługuje wszystkie 8 zbiorów GUS. *(Jedyną agregacją w Silver jest uśrednienie dziennych kursów NBP do poziomu miesięcznego w `staging.fact_nbp_fx`.)*
+- **Silver → Gold (`mart.*`):** wykonujemy *pivot* do **formatu szerokiego (poziomego)** gotowego pod Power BI, łączymy GUS z NBP i wyliczamy wskaźniki pochodne (`implied_tot_yoy`, `tot_ma3`, `tot_z36`, `indirect_hub_share_pct`, `eur_pln_yoy_pct`).
+
+### Wykaz 13 miar w warstwie Silver (`ref.dim_measure`)
+
+| `id_miara` | `business_code` | Opis w GUS | Wykorzystanie w Gold |
+|---:|---|---|---|
+| `2` | `MOM_100` | okres poprzedni = 100 | `mv_electronics_terms_of_trade` |
+| `3` | `MOM_CURR_100` | okres poprzedni = 100 (ceny bieżące) | Silver (analizy m/m) |
+| `5` | `YOY_100` | analogiczny okres roku poprzedniego = 100 | `mv_electronics_terms_of_trade`, `mv_export_market_pulse` |
+| `6` | `YOY_CURR_100` | analogiczny okres roku poprzedniego = 100 (ceny bieżące / PLN) | `mv_hub_intermediation_gap`, `mv_export_market_pulse` |
+| `99` | `SHARE_PCT` | udział w pozycji ogółem `[%]` | `mv_hub_intermediation_gap` |
+| `180` | `VALUE_PLN` | wartość `[zł]` | `mv_hub_intermediation_gap` (+ walidacja FX w DQ) |
+| `277` | `MASS_KG` | masa `[kg]` | `mv_hub_intermediation_gap` (`export_eur_per_kg`) |
+| `314` | `VALUE_EUR` | wartość `[EUR]` | `mv_hub_intermediation_gap` |
+| `315` | `VALUE_USD` | wartość `[USD]` | `mv_hub_intermediation_gap` |
+| `357` | `BASE_2021_100` | przeciętna miesięczna 2021 = 100 (ceny stałe) | *pominięta w Gold — patrz niżej* |
+| `21` | *(brak)* | przeciętna miesięczna 2015 = 100 *(stara baza)* | *pominięta w Gold — patrz niżej* |
+| `318` | *(brak)* | analogiczny okres roku poprzedniego = 100 (EUR) | *pominięta w Gold — patrz niżej* |
+| `319` | *(brak)* | analogiczny okres roku poprzedniego = 100 (USD) | *pominięta w Gold — patrz niżej* |
+
+**Dlaczego 4 miary (`21`, `357`, `318`, `319`) zostają w Silver i nie trafiają do Gold?**
+1. **Zmiana roku bazowego (*re-basing*) w nowych zamówieniach (`21` i `357`):** GUS wycofał bazę `2015=100` (dane tylko do 2023 r.) i wprowadził `2021=100` (dane od 2021 r.), więc żadna z nich nie daje ciągłego szeregu `2019–2026`. W Gold używamy ciągłej, odsezonowanej miary `6` (`YOY_CURR_100`, 94 miesiące).
+2. **Unikanie redundancji (`318` i `319`):** w `mv_hub_intermediation_gap` są już surowe kwoty `export_eur` i `export_usd` (`314`, `315`), więc dynamikę r/r w EUR/USD można w razie potrzeby policzyć jedną miarą DAX w Power BI bez dublowania kolumn w tabeli.
+
+
+## 4. Format danych i miary: Silver vs Gold
+
+### Rozdział odpowiedzialności między warstwami
+- **Bronze → Silver (`staging.fact_dbw_observation`):** normalizujemy strukturę, typy danych i kalendarz (`period_date`), ale **samych liczb z GUS nie przeliczamy**. Tabela ma **format długi (pionowy)** — dla jednego miesiąca i jednego kierunku występuje tyle wierszy, ile miar zwraca GUS (różnią się kolumną `id_miara` i `wartosc`). Dzięki temu jedna tabela bez zmian schematu obsługuje wszystkie 8 zbiorów GUS. *(Jedyną agregacją w Silver jest uśrednienie dziennych kursów NBP do poziomu miesięcznego w `staging.fact_nbp_fx`.)*
+- **Silver → Gold (`mart.*`):** wykonujemy *pivot* do **formatu szerokiego (poziomego)** gotowego pod Power BI, łączymy GUS z NBP i wyliczamy wskaźniki pochodne (`implied_tot_yoy`, `tot_ma3`, `tot_z36`, `indirect_hub_share_pct`, `eur_pln_yoy_pct`).
+
+### Wykaz 13 miar w warstwie Silver (`ref.dim_measure`)
+
+| `id_miara` | `business_code` | Opis w GUS | Wykorzystanie w Gold |
+|---:|---|---|---|
+| `2` | `MOM_100` | okres poprzedni = 100 | `mv_electronics_terms_of_trade` |
+| `3` | `MOM_CURR_100` | okres poprzedni = 100 (ceny bieżące) | Silver (analizy m/m) |
+| `5` | `YOY_100` | analogiczny okres roku poprzedniego = 100 | `mv_electronics_terms_of_trade`, `mv_export_market_pulse` |
+| `6` | `YOY_CURR_100` | analogiczny okres roku poprzedniego = 100 (ceny bieżące / PLN) | `mv_hub_intermediation_gap`, `mv_export_market_pulse` |
+| `99` | `SHARE_PCT` | udział w pozycji ogółem `[%]` | `mv_hub_intermediation_gap` |
+| `180` | `VALUE_PLN` | wartość `[zł]` | `mv_hub_intermediation_gap` (+ walidacja FX w DQ) |
+| `277` | `MASS_KG` | masa `[kg]` | `mv_hub_intermediation_gap` (`export_eur_per_kg`) |
+| `314` | `VALUE_EUR` | wartość `[EUR]` | `mv_hub_intermediation_gap` |
+| `315` | `VALUE_USD` | wartość `[USD]` | `mv_hub_intermediation_gap` |
+| `357` | `BASE_2021_100` | przeciętna miesięczna 2021 = 100 (ceny stałe) | *pominięta w Gold — patrz niżej* |
+| `21` | *(brak)* | przeciętna miesięczna 2015 = 100 *(stara baza)* | *pominięta w Gold — patrz niżej* |
+| `318` | *(brak)* | analogiczny okres roku poprzedniego = 100 (EUR) | *pominięta w Gold — patrz niżej* |
+| `319` | *(brak)* | analogiczny okres roku poprzedniego = 100 (USD) | *pominięta w Gold — patrz niżej* |
+
+**Dlaczego 4 miary (`21`, `357`, `318`, `319`) zostają w Silver i nie trafiają do Gold?**
+1. **Zmiana roku bazowego (*re-basing*) w nowych zamówieniach (`21` i `357`):** GUS wycofał bazę `2015=100` (dane tylko do 2023 r.) i wprowadził `2021=100` (dane od 2021 r.), więc żadna z nich nie daje ciągłego szeregu `2019–2026`. W Gold używamy ciągłej, odsezonowanej miary `6` (`YOY_CURR_100`, 94 miesiące).
+2. **Unikanie redundancji (`318` i `319`):** w `mv_hub_intermediation_gap` są już surowe kwoty `export_eur` i `export_usd` (`314`, `315`), więc dynamikę r/r w EUR/USD można w razie potrzeby policzyć jedną miarą DAX w Power BI bez dublowania kolumn w tabeli.
