@@ -22,19 +22,17 @@ flowchart LR
 
 Moduł [notify_power_automate.py](file:///d:/repos/rekrutacja/tme-gus-export-sourcing-pulse/src/alerting/notify_power_automate.py) na końcu miesięcznego DAG-a odczytuje najnowsze statusy z widoków `mart.*` oraz licznik rewizji z `staging.etl_revision_audit`, ocenia reguły alarmowe i wysyła ustrukturyzowany JSON na adres `PA_WEBHOOK_URL` (lub zapisuje go lokalnie do `reports/last_power_automate_payload.json` w trybie `--dry-run`).
 
-### Reguły wyzwalania alertów
-| Kategoria | Źródło (Gold) | Warunek alarmowy | Poziom | Rekomendowana akcja TME |
-|---|---|---|---:|---|
-| **Presja marżowa** | `mart.mv_electronics_terms_of_trade` | `pricing_status = 'MARGIN_SQUEEZE_ALERT'` (`implied_tot_yoy < 97.5`) | `HIGH` | Przegląd cenników eksportowych i polityki zabezpieczeń EUR/USD |
-| **Hamowanie popytu** | `mart.mv_export_market_pulse` | `market_momentum_status = 'CONTRACTION'` (`sitc7_export_vol_yoy_pct <= -5.0%`) | `HIGH` | Redukcja ryzyka *overstock* w indeksach wolnorotujących (grupa C) |
-| **Ekspansja popytu** | `mart.mv_export_market_pulse` | `market_momentum_status = 'STRONG_EXPANSION'` (`>= +8.0%`) | `MEDIUM` | Podniesienie bufora *Safety Stock* dla indeksów grupy A |
-| **Zależność od hubów UE** | `mart.mv_hub_intermediation_gap` | `indirect_hub_share_pct >= 30.0%` (Azja/LatAm) | `MEDIUM` | Audyt stawek frachtu bezpośredniego vs konsolidacja przez huby UE |
+### Reguły wyzwalania alertów (MVP – wyłącznie sygnały krytyczne)
+| Kategoria | Źródło (Gold) | Warunek alarmowy | Rekomendowana akcja TME |
+|---|---|---|---|
+| **Presja marżowa** | `mart.mv_electronics_terms_of_trade` | `pricing_status = 'MARGIN_SQUEEZE_ALERT'` (`implied_tot_yoy < 97.5`) | Przegląd cenników eksportowych i polityki zabezpieczeń EUR/USD |
+| **Hamowanie popytu** | `mart.mv_export_market_pulse` | `market_momentum_status = 'CONTRACTION'` (`sitc7_export_vol_yoy_pct <= -5.0%`) | Redukcja ryzyka *overstock* w indeksach wolnorotujących (grupa C) |
 
 ### Konfiguracja przepływu w Power Automate (Cloud Flow)
 1. **Trigger:** `When a HTTP request is received` (metoda `POST`, wygenerowany URL wklejamy jako `PA_WEBHOOK_URL` w `.env`).
-2. **Condition:** Sprawdzenie `triggerBody()?['overall_severity']` (`HIGH` / `MEDIUM` / `INFO`).
+2. **Condition:** Sprawdzenie `triggerBody()?['has_alerts']` (`true` = `ALERT`, `false` = `OK`).
 3. **Action 1 (MS Teams):** `Post card in a chat or channel` — w treści wstawiamy bezpośrednio gotowy obiekt `triggerBody()?['teams_adaptive_card']` (Adaptive Card v1.4 z tabelą KPI i listą rekomendacji).
-4. **Action 2 (Audyt decyzji):** Dla alertów `HIGH` / `MEDIUM` przepływ tworzy rekord w tabeli **Dataverse / SharePoint List** (`Alert Action Log`) z przypisanym Category Managerem i terminem reakcji (+5 dni roboczych).
+4. **Action 2 (Audyt decyzji):** Dla `has_alerts = true` przepływ tworzy rekord w tabeli **Dataverse / SharePoint List** (`Alert Action Log`) z przypisanym Category Managerem i terminem reakcji (+5 dni roboczych).
 
 ---
 

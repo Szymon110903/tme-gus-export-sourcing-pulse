@@ -1,81 +1,35 @@
 {
   "source": "tme-gus-export-sourcing-pulse",
-  "generated_at_utc": "2026-11-26T15:43:33Z",
-  "overall_severity": "MEDIUM",
-  "alert_count": 5,
-  "high_severity_count": 0,
-  "alerts": [
-    {
-      "severity": "INFO",
-      "category": "MARGIN_OPPORTUNITY",
-      "title": "Korzystne Terms of Trade (PKWiU_26_ELEKTRONIKA, 2026-09-01)",
-      "message": "Terms of Trade wynosi 103.12 (spread: +3.20 pp). Sprzyjające otoczenie cenowe dla ekspansji wolumenowej."
-    },
-    {
-      "severity": "MEDIUM",
-      "category": "EXPORT_DEMAND",
-      "title": "Silna ekspansja eksportu SITC 7 – rynek CEE (2026-08-01)",
-      "message": "Wolumen eksportu SITC 7 rośnie r/r o +43.70%. Rekomendacja: podnieść bufor Safety Stock dla kluczowych indeksów grupy A."
-    },
-    {
-      "severity": "MEDIUM",
-      "category": "EXPORT_DEMAND",
-      "title": "Silna ekspansja eksportu SITC 7 – rynek EU (2026-08-01)",
-      "message": "Wolumen eksportu SITC 7 rośnie r/r o +13.10%. Rekomendacja: podnieść bufor Safety Stock dla kluczowych indeksów grupy A."
-    },
-    {
-      "severity": "MEDIUM",
-      "category": "EXPORT_DEMAND",
-      "title": "Silna ekspansja eksportu SITC 7 – rynek TOTAL (2026-08-01)",
-      "message": "Wolumen eksportu SITC 7 rośnie r/r o +21.40%. Rekomendacja: podnieść bufor Safety Stock dla kluczowych indeksów grupy A."
-    },
-    {
-      "severity": "MEDIUM",
-      "category": "SOURCING_HUB_DEPENDENCY",
-      "title": "Wysoki udział pośrednictwa hubów UE (2026-09-01)",
-      "message": "33.5% importu z krajów rozwijających się (Azja/LatAm) trafia do Polski przez huby pośredniczące UE. Warto zweryfikować stawki frachtu bezpośredniego."
-    }
-  ],
+  "generated_at_utc": "2026-11-26T17:50:41Z",
+  "status": "OK",
+  "has_alerts": false,
+  "alert_count": 0,
+  "alerts": [],
   "snapshot": {
-    "generated_at_utc": "2026-11-26T15:43:33Z",
+    "generated_at_utc": "2026-11-26T17:50:41Z",
     "tot_latest": [
       {
         "period_date": "2026-09-01",
         "sector_code": "PKWiU_26_ELEKTRONIKA",
         "sector_name_pl": "26 - KOMPUTERY, WYROBY ELEKTRONICZNE I OPTYCZNE",
-        "imp_price_yoy_idx": 102.5,
-        "exp_price_yoy_idx": 105.7,
         "implied_tot_yoy": 103.12,
         "price_spread_pp": 3.2,
-        "tot_ma3": 102.73,
-        "tot_z36": 0.89,
-        "eur_pln_avg": 4.344609,
         "pricing_status": "MARGIN_TAILWIND"
       },
       {
         "period_date": "2026-09-01",
         "sector_code": "PKWiU_27_ELEKTRYKA",
         "sector_name_pl": "27 - URZĄDZENIA ELEKTRYCZNE",
-        "imp_price_yoy_idx": 101.7,
-        "exp_price_yoy_idx": 101.2,
         "implied_tot_yoy": 99.51,
         "price_spread_pp": -0.5,
-        "tot_ma3": 100.33,
-        "tot_z36": -0.25,
-        "eur_pln_avg": 4.344609,
         "pricing_status": "NEUTRAL"
       },
       {
         "period_date": "2026-09-01",
         "sector_code": "PKWiU_28_MASZYNY",
         "sector_name_pl": "28 - MASZYNY I URZĄDZENIA, GDZIE INDZIEJ NIESKLASYFIKOWANE",
-        "imp_price_yoy_idx": 101.5,
-        "exp_price_yoy_idx": 102.2,
         "implied_tot_yoy": 100.69,
         "price_spread_pp": 0.7,
-        "tot_ma3": 101.29,
-        "tot_z36": 0.85,
-        "eur_pln_avg": 4.344609,
         "pricing_status": "NEUTRAL"
       }
     ],
@@ -85,8 +39,6 @@
         "target_market": "CEE",
         "market_name_pl": "kraje Europy Środkowo-Wschodniej",
         "sitc7_export_vol_yoy_pct": 43.7,
-        "sitc7_export_vol_ma3_pct": 32.23,
-        "ind_foreign_new_orders_yoy_pct": 3.4,
         "market_momentum_status": "STRONG_EXPANSION"
       },
       {
@@ -94,8 +46,6 @@
         "target_market": "EU",
         "market_name_pl": "kraje Unii Europejskiej",
         "sitc7_export_vol_yoy_pct": 13.1,
-        "sitc7_export_vol_ma3_pct": 36.63,
-        "ind_foreign_new_orders_yoy_pct": 3.4,
         "market_momentum_status": "STRONG_EXPANSION"
       },
       {
@@ -103,20 +53,9 @@
         "target_market": "TOTAL",
         "market_name_pl": "Ogółem",
         "sitc7_export_vol_yoy_pct": 21.4,
-        "sitc7_export_vol_ma3_pct": 33.37,
-        "ind_foreign_new_orders_yoy_pct": 3.4,
         "market_momentum_status": "STRONG_EXPANSION"
       }
     ],
-    "hub_gap_latest": {
-      "period_date": "2026-09-01",
-      "region_group": "DEVELOPING_ASIA_LATAM",
-      "region_name_pl": "Kraje rozwijające się",
-      "imp_origin_eur": 12983081742.0,
-      "imp_consign_eur": 8637799227.0,
-      "indirect_hub_share_pct": 33.47,
-      "share_gap_pp": -12.08
-    },
     "revisions_last_30d": 0
   },
   "teams_adaptive_card": {
@@ -128,12 +67,12 @@
         "type": "TextBlock",
         "size": "Large",
         "weight": "Bolder",
-        "text": "TME Export & Sourcing Pulse – Raport Alertów (MEDIUM)",
+        "text": "TME Export & Sourcing Pulse – Status: OK",
         "wrap": true
       },
       {
         "type": "TextBlock",
-        "text": "Wygenerowano: 2026-11-26T15:43:33Z | Źródło: GUS DBW + NBP (Supabase Gold)",
+        "text": "Wygenerowano: 2026-11-26T17:50:41Z | Źródło: GUS DBW + NBP (Supabase Gold)",
         "isSubtle": true,
         "spacing": "None",
         "wrap": true
@@ -173,37 +112,7 @@
       },
       {
         "type": "TextBlock",
-        "text": "Sygnały decyzyjne dla Zakupów i Category Managementu:",
-        "weight": "Bolder",
-        "spacing": "Medium"
-      },
-      {
-        "type": "TextBlock",
-        "text": "**[INFO] Korzystne Terms of Trade (PKWiU_26_ELEKTRONIKA, 2026-09-01)** — Terms of Trade wynosi 103.12 (spread: +3.20 pp). Sprzyjające otoczenie cenowe dla ekspansji wolumenowej.",
-        "wrap": true,
-        "spacing": "Small"
-      },
-      {
-        "type": "TextBlock",
-        "text": "**[MEDIUM] Silna ekspansja eksportu SITC 7 – rynek CEE (2026-08-01)** — Wolumen eksportu SITC 7 rośnie r/r o +43.70%. Rekomendacja: podnieść bufor Safety Stock dla kluczowych indeksów grupy A.",
-        "wrap": true,
-        "spacing": "Small"
-      },
-      {
-        "type": "TextBlock",
-        "text": "**[MEDIUM] Silna ekspansja eksportu SITC 7 – rynek EU (2026-08-01)** — Wolumen eksportu SITC 7 rośnie r/r o +13.10%. Rekomendacja: podnieść bufor Safety Stock dla kluczowych indeksów grupy A.",
-        "wrap": true,
-        "spacing": "Small"
-      },
-      {
-        "type": "TextBlock",
-        "text": "**[MEDIUM] Silna ekspansja eksportu SITC 7 – rynek TOTAL (2026-08-01)** — Wolumen eksportu SITC 7 rośnie r/r o +21.40%. Rekomendacja: podnieść bufor Safety Stock dla kluczowych indeksów grupy A.",
-        "wrap": true,
-        "spacing": "Small"
-      },
-      {
-        "type": "TextBlock",
-        "text": "**[MEDIUM] Wysoki udział pośrednictwa hubów UE (2026-09-01)** — 33.5% importu z krajów rozwijających się (Azja/LatAm) trafia do Polski przez huby pośredniczące UE. Warto zweryfikować stawki frachtu bezpośredniego.",
+        "text": "Brak alertów krytycznych — brak presji marżowej i brak hamowania eksportu SITC 7.",
         "wrap": true,
         "spacing": "Small"
       }
