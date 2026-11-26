@@ -162,10 +162,3 @@ flowchart LR
 | **Microsoft Power Automate + Power Apps** | **Power Automate**, **Power Apps** oraz **SAP Build Process Automation** |
 
 ---
-
-## 4. Konfiguracja Supabase (2 minuty)
-
-1. Utwórz darmowy projekt na https://supabase.com/ (region np. *Central EU – Frankfurt*).
-2. W **Project Settings → Database → Connection string** skopiuj adres PostgreSQL (URI, tryb *Session pooler* lub *Direct*) i wklej jako `DATABASE_URL` w pliku `.env`.
-3. W **Storage → New bucket** utwórz prywatny bucket o nazwie **`gus-bronze`**.
-4. W **Project Settings → Storage → S3 Access Keys** wygeneruj parę kluczy (`Access Key ID` i `Secret Access Key`) oraz skopiuj `Endpoint` i `Region` do `.env`.

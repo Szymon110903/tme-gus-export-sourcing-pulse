@@ -246,11 +246,12 @@ def extract_all(years: list[int], force_refresh: bool = False) -> None:
             f"inserted={total_inserted}, revised={total_revised}"
         )
 
-        print(f"[2/2] Extracting NBP FX rates ({config['nbp_currencies']}) for years={years}...")
+        nbp_years = sorted(set(years) | ({min(years) - 1} if years else set()))
+        print(f"[2/2] Extracting NBP FX rates ({config['nbp_currencies']}) for years={nbp_years} (includes YoY base year)...")
         fx_rows_total = 0
         with NBPClient(settings) as nbp:
             for currency in config["nbp_currencies"]:
-                for year in years:
+                for year in nbp_years:
                     if year > today.year:
                         continue
                     bronze_key = storage.nbp_rates_key(currency, year)

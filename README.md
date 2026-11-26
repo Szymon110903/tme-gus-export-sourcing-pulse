@@ -10,11 +10,13 @@ Rozwiązanie łączy oficjalne dane **API DBW GUS** (handel zagraniczny, ceny im
 
 Na podstawie rzeczywistych danych GUS DBW i NBP załadowanych do warstwy Gold (`mart.*`) w Supabase (regresja OLS z odpornymi błędami standardowymi **Newey-West HAC** oraz testy korelacji z przesunięciem czasowym i przyczynowości **Grangera**):
 
-- **Asymetryczna transmisja kursu EUR/PLN w elektronice (`PKWiU 26`):**
-  - Kursy walut (`EUR/PLN`, `USD/PLN`) wyjaśniają **`R² = 0.737`** zmienności cen importu elektroniki r/r (`β_EUR = +0.584`, `p < 0.0001`, korelacja `r = +0.831` przy opóźnieniu `lag = 0 m`), podczas gdy w cenach eksportu elektroniki dopasowanie wynosi tylko **`R² = 0.312`** (`β_EUR = +0.286`).
-  - Przekłada się to na statystycznie istotny **ścisk marżowy (*Terms of Trade*)** przy osłabieniu złotego (`β_EUR = -0.309`, `p = 0.041`).
-- **Różnice sektorowe (`PKWiU 28` – Maszyny i automatyka):**
-  - W segmencie maszyn/automatyki transmisja kursowa w eksporcie jest znacznie silniejsza (`R² = 0.707`), a wskaźnik *Terms of Trade* pozostaje statystycznie neutralny względem wahań kursu (`p = 0.298`).
+- **Asymetryczna transmisja kursu EUR/PLN w elektronice (`PKWiU 26`, pełna próba `n = 93` mies.):**
+  - Kursy walut (`EUR/PLN`, `USD/PLN`) wyjaśniają **`R² = 0.606`** zmienności cen importu elektroniki r/r (`β_EUR = +0.624`, `p < 0.0001`, korelacja `r = +0.771` przy `lag = 0 m`), podczas gdy w cenach eksportu elektroniki dopasowanie wynosi **`R² = 0.259`** (`β_EUR = +0.318`).
+  - Przekłada się to na statystycznie istotny **ścisk marżowy (*Terms of Trade*)** przy osłabieniu złotego (`β_EUR = -0.316`, `p = 0.029`).
+- **Różnice sektorowe (`PKWiU 27` Elektryka i `PKWiU 28` Maszyny/Automatyka):**
+  - W elektryce (`PKWiU 27`) kursy FX wyjaśniają aż **`R² = 0.711`** cen importu (`p < 0.0001`). W segmencie maszyn/automatyki (`PKWiU 28`) transmisja kursowa w eksporcie jest silniejsza (`R² = 0.656`), a wskaźnik *Terms of Trade* pozostaje statystycznie neutralny względem kursu (`p = 0.278`).
+- **Zamówienia zagraniczne a eksport SITC 7 (`n = 92`):**
+  - Nowe zamówienia niekrajowe w przemyśle (`var=815`) wykazują dodatnią korelację z wolumenem eksportu SITC 7 ogółem (`r = +0.573`) oraz do UE (`r = +0.562`).
 - **Kontrola Jakości Danych (DQ Gates):**
   - 7 reguł SQL w [dq_checks.sql](data_quality/dq_checks.sql) (5 `CRITICAL` — 100% `PASS`, 0 błędnych wierszy; automatyczna detekcja rewizji GUS w `staging.etl_revision_audit`).
 
@@ -31,6 +33,7 @@ Na podstawie rzeczywistych danych GUS DBW i NBP załadowanych do warstwy Gold (`
   - `mart.analytics_fx_regression` oraz `mart.analytics_lead_lag_granger` — gotowe tabele wyników statystycznych do bezpośredniego podpięcia pod **Power BI Desktop / SAP Analytics Cloud**.
 
 ### Dokumentacja techniczna
+- Źródła danych, zawartość wszystkich zbiorów i interpretacja biznesowa: [docs/data_sources_and_dictionary.md](docs/data_sources_and_dictionary.md)
 - Model danych i architektura chmurowa (ERD + Medallion): [docs/data_model_and_cloud_storage.md](docs/data_model_and_cloud_storage.md)
 - Automatycznie zweryfikowany katalog metadanych GUS DBW: [docs/gus_metadata_catalog.md](docs/gus_metadata_catalog.md)
 - Mapowanie na **Power Automate, Power Apps i ekosystem SAP (Datasphere / SAC / AfO / SBPA)**: [docs/power_platform_sap_mapping.md](docs/power_platform_sap_mapping.md)
@@ -69,9 +72,9 @@ docker compose run --rm etl pytest -v
 docker compose --profile airflow up -d --build
 # Panel WWW: http://localhost:8080 (admin / admin)
 ```
-Dostępne DAG-i w [dags/tme_gus_export_sourcing_pulse.py](dags/tme_gus_export_sourcing_pulse.py):
-- **`tme_gus_export_sourcing_monthly`** (`0 6 22 * *`) — docelowy potok produkcyjny uruchamiany 22. dnia miesiąca po publikacji biuletynu GUS (`init_db → sync_dictionaries → discover_metadata → extract_recent_window → build_marts → run_dq_gates → run_statistical_models → generate_html_report → notify_power_automate`).
-- **`tme_gus_backfill_chunked`** (`*/20 * * * *`, domyślnie zapauzowany) — bezpieczne dociąganie wieloletniej historii z poszanowaniem limitów API GUS.
+Dostępne DAG-i w katalogu `dags/`:
+- **`tme_gus_export_sourcing_monthly`** ([dags/tme_gus_export_sourcing_monthly.py](dags/tme_gus_export_sourcing_monthly.py), `0 6 22 * *`) — docelowy potok produkcyjny uruchamiany 22. dnia miesiąca po publikacji biuletynu GUS (`init_db → sync_dictionaries → discover_metadata → extract_recent_window → build_marts → run_dq_gates → run_statistical_models → generate_html_report → notify_power_automate`).
+- **`tme_gus_backfill_chunked`** ([dags/tme_gus_backfill_chunked.py](dags/tme_gus_backfill_chunked.py), `*/20 * * * *`, domyślnie zapauzowany) — bezpieczne dociąganie wieloletniej historii z poszanowaniem limitów API GUS.
 
 ---
 
@@ -81,7 +84,8 @@ Dostępne DAG-i w [dags/tme_gus_export_sourcing_pulse.py](dags/tme_gus_export_so
 ├── config/
 │   └── trade_series_config.yml         # Centralny rejestr zmiennych, przekrojów i business_code
 ├── dags/
-│   └── tme_gus_export_sourcing_pulse.py # DAG produkcyjny (miesięczny) + DAG backfill
+│   ├── tme_gus_export_sourcing_monthly.py # DAG produkcyjny (miesięczny, End-to-End)
+│   └── tme_gus_backfill_chunked.py        # DAG pomocniczy do dociągania historii
 ├── data_quality/
 │   └── dq_checks.sql                   # 7 reguł jakości danych (CRITICAL / WARN)
 ├── docs/
