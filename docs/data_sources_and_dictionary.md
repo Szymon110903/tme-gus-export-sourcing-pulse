@@ -3,7 +3,6 @@
 Zwięzły przegląd pochodzenia danych w projekcie, ich zawartości oraz znaczenia poszczególnych wskaźników.
 
 ---
-
 ## 1. Skąd pobierane są dane?
 
 Projekt korzysta wyłącznie z **2 oficjalnych, darmowych źródeł publicznych (REST API)**:
@@ -15,19 +14,19 @@ Projekt korzysta wyłącznie z **2 oficjalnych, darmowych źródeł publicznych 
 
 ---
 
-## 2. Wykaz obszarów, zmiennych i przekrojów
+## 2. Wykaz obszarów, zbiorów i przekrojów
 
-| # | Obszar tematyczny GUS | Nazwa zmiennej (`id-zmienna`) | Przekrój (`id-przekroj`) – wymiary | Tryb okresów |
+| # | Obszar tematyczny | Nazwa zbioru | Przekrój (wymiary danych) | Tryb okresów |
 |---:|---|---|---|---|
-| 1 | **Ceny w handlu zagranicznym** | Wskaźniki cen importu i eksportu (`329`) | `772` — `Polska; Import/Eksport; PKWiU_B-D` | Miesięczny (`247`–`258`) |
-| 2 | **Ceny w handlu zagranicznym** | Wskaźniki cen transakcyjnych w handlu zagranicznym (`328`) | `773` — `Polska; Import/Eksport/Terms of trade; Kraje; Sekcja SITC` | Narastający (`247`, `259`–`269`) |
-| 3 | **Obroty towarowe** | Eksport towarów (`220`) | `1144` — `Polska; Ugrupowania` | Miesięczny (`247`–`258`) |
-| 4 | **Obroty towarowe** | Import towarów wg kraju pochodzenia (`221`) | `1144` — `Polska; Ugrupowania` | Miesięczny (`247`–`258`) |
-| 5 | **Obroty towarowe** | Import towarów wg kraju wysyłki (`222`) | `1144` — `Polska; Ugrupowania` | Miesięczny (`247`–`258`) |
-| 6 | **Obroty towarowe** | Wskaźnik wolumenu w obrotach handlu zagranicznego w eksporcie (`227`) | `789` — `Polska; Kraje; Sekcja SITC` | Miesięczny (`247`–`258`) |
-| 7 | **Obroty towarowe** | Wskaźnik wolumenu w obrotach handlu zagranicznego w imporcie (`228`) | `789` — `Polska; Kraje; Sekcja SITC` | Miesięczny (`247`–`258`) |
-| 8 | **Przemysł** | Nowe zamówienia w przemyśle (`815`) | `828` — `Polska; Rodzaje nowych zamówień w przemyśle` | Miesięczny (`247`–`258`) |
-| 9 | **NBP Web API** *(poza GUS)* | Kursy średnie walut – Tabela A (`EUR`, `USD`) | `/rates/a/{eur\|usd}/{od}/{do}/` | Dzienne → miesięczne |
+| 1 | **Ceny w handlu zagranicznym** *(GUS)* | Wskaźniki cen importu i eksportu | Polska; Import/Eksport; działy PKWiU (26, 27, 28, ogółem) | Miesięczny |
+| 2 | **Ceny w handlu zagranicznym** *(GUS)* | Wskaźniki cen transakcyjnych w handlu zagranicznym | Polska; Import/Eksport/Terms of Trade; Kraje (Ogółem, UE, CEE); Sekcja SITC 7 | Narastający (YTD) |
+| 3 | **Obroty towarowe** *(GUS)* | Eksport towarów | Polska; Ugrupowania gospodarcze (UE, Strefa Euro, CEE, Kraje rozwinięte, Kraje rozwijające się) | Miesięczny |
+| 4 | **Obroty towarowe** *(GUS)* | Import towarów wg kraju pochodzenia | Polska; Ugrupowania gospodarcze | Miesięczny |
+| 5 | **Obroty towarowe** *(GUS)* | Import towarów wg kraju wysyłki | Polska; Ugrupowania gospodarcze | Miesięczny |
+| 6 | **Obroty towarowe** *(GUS)* | Wskaźnik wolumenu w eksporcie | Polska; Kraje (Ogółem, UE, CEE); Sekcja SITC 7 | Miesięczny |
+| 7 | **Obroty towarowe** *(GUS)* | Wskaźnik wolumenu w imporcie | Polska; Kraje (Ogółem, UE, CEE); Sekcja SITC 7 | Miesięczny |
+| 8 | **Przemysł** *(GUS)* | Nowe zamówienia w przemyśle | Polska; Rodzaj zamówień (Ogółem, Niekrajowe / eksportowe) | Miesięczny |
+| 9 | **Kursy walut** *(NBP)* | Kursy średnie walut – Tabela A | Waluty EUR/PLN oraz USD/PLN (średnia, min, max, zmienność) | Dzienne → miesięczne |
 
 *(W portalu `dbw.stat.gov.pl` obszary **Ceny w handlu zagranicznym** i **Obroty towarowe** znajdują się w gałęzi **Handel zagraniczny**, a **Nowe zamówienia w przemyśle** w gałęzi **Przemysł**.)*
 

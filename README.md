@@ -1,8 +1,13 @@
 # TME Export & Sourcing Pulse
 
-Automatyczny, produkcyjny potok analityczny (**Python 3.12 w Dockerze + Supabase PostgreSQL 16 + Supabase S3 Storage + Apache Airflow + Power BI Desktop + Power Automate / Power Apps**) zaprojektowany dla **Transfer Multisort Elektronik (TME)** — globalnego dystrybutora i eksportera komponentów elektronicznych oraz automatyki przemysłowej.
+> **Temat pracy / analizy:** *Analiza presji marżowej (Terms of Trade), transmisji kursów walutowych (EUR/USD), chłonności rynków eksportowych (UE vs CEE) oraz zależności sourcingowej od europejskich hubów logistycznych w branży elektronicznej i automatyki przemysłowej (PKWiU 26–28, SITC 7).
 
-Rozwiązanie łączy oficjalne dane **API DBW GUS** (handel zagraniczny, ceny importu/eksportu wg PKWiU, wolumeny SITC 7, zamówienia eksportowe) z kursami walut **API NBP (EUR/PLN, USD/PLN)**, aby wcześnie wykrywać **presję marżową (*Terms of Trade*)**, **zmiany chłonności rynków eksportowych (UE vs CEE)** oraz **zależność sourcingową od hubów europejskich**.
+Projekt odpowiada na **3 kluczowe pytania biznesowe**:
+1. **Marża i cenniki:** Jak mocno wahania kursów `EUR/PLN` i `USD/PLN` przekładają się na ceny importu i eksportu elektroniki (`PKWiU 26`), elektryki (`PKWiU 27`) oraz maszyn (`PKWiU 28`) i kiedy powstaje ryzyko ścisku marży (*Terms of Trade < 97,5*)?
+2. **Popyt eksportowy i zapasy (*Safety Stock*):** Jak zmienia się realny (ilościowy) wolumen eksportu `SITC 7` na rynkach **UE** i **CEE** oraz czy nowe zamówienia zagraniczne wyprzedzają fizyczny eksport?
+3. **Sourcing i logistyka:** Jaka część importu z Azji i krajów rozwijających się trafia do Polski pośrednio przez europejskie huby logistyczne (*kraj pochodzenia* vs *kraj wysyłki*)?
+
+Rozwiązanie łączy oficjalne dane **API DBW GUS** (handel zagraniczny, ceny importu/eksportu wg PKWiU, wolumeny SITC 7, zamówienia eksportowe) z kursami walut **API NBP (EUR/PLN, USD/PLN)** w automatycznym potoku (**Python 3.12 + Supabase PostgreSQL 16/S3 + Apache Airflow + Power BI Desktop + Power Automate**).
 
 ---
 
