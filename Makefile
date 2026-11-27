@@ -27,7 +27,6 @@ dq:
 
 run-analysis:
 	docker compose run --rm etl python -m src.analytics.models_fx_granger
-	docker compose run --rm etl python -m src.analytics.generate_report
 
 notify:
 	docker compose run --rm etl python -m src.alerting.notify_power_automate --dry-run

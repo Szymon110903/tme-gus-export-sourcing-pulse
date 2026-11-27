@@ -32,6 +32,9 @@ def build_and_refresh_marts(recreate: bool = False) -> None:
                 cnt, min_d, max_d = cur.fetchone()
                 print(f"       Refreshed {mv_name}: rows={cnt}, range={min_d}..{max_d}")
 
+        print("[GOLD] Ensuring mart.dim_date (06_mart_dim_date.sql)...")
+        execute_sql_file(conn, "06_mart_dim_date.sql")
+
     print("OK: All Gold marts built and refreshed successfully.")
 
 

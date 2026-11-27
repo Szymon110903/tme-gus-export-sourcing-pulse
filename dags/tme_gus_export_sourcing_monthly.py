@@ -68,12 +68,6 @@ def _task_run_statistical_models() -> None:
     run_models()
 
 
-def _task_generate_html_report() -> None:
-    from src.analytics.generate_report import generate_reports
-
-    generate_reports()
-
-
 def _task_notify_power_automate() -> None:
     from src.alerting.notify_power_automate import dispatch_alerts
 
@@ -82,7 +76,7 @@ def _task_notify_power_automate() -> None:
 
 with DAG(
     dag_id="tme_gus_export_sourcing_monthly",
-    description="Docelowy potok miesięczny: GUS DBW + NBP -> Supabase (Bronze/Silver/Gold) -> DQ -> Modele -> HTML -> Power Automate",
+    description="Docelowy potok miesięczny: GUS DBW + NBP -> Supabase (Bronze/Silver/Gold) -> DQ -> Modele -> Power Automate",
     default_args=DEFAULT_ARGS,
     start_date=datetime(2025, 1, 1),
     schedule="0 6 22 * *",
@@ -97,7 +91,6 @@ with DAG(
     t_marts = PythonOperator(task_id="build_marts", python_callable=_task_build_marts)
     t_dq = PythonOperator(task_id="run_dq_gates", python_callable=_task_run_dq_gates)
     t_models = PythonOperator(task_id="run_statistical_models", python_callable=_task_run_statistical_models)
-    t_report = PythonOperator(task_id="generate_html_report", python_callable=_task_generate_html_report)
     t_notify = PythonOperator(task_id="notify_power_automate", python_callable=_task_notify_power_automate)
 
     (
@@ -108,7 +101,6 @@ with DAG(
         >> t_marts
         >> t_dq
         >> t_models
-        >> t_report
         >> t_notify
     )
 

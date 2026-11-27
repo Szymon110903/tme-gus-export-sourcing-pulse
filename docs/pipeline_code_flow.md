@@ -18,19 +18,18 @@ flowchart TD
     T6{"6. run_dq_gates\n(src/quality/run_dq.py)\n7 regul SQL (5 CRITICAL, 2 WARN)"}
     STOP["STOP PIPELINE\nBlad CRITICAL blokuje raport i alert"]
     T7["7. run_statistical_models\n(src/analytics/models_fx_granger.py)\nOLS HAC + korelacje lag + Granger -> mart.*"]
-    T8["8. generate_html_report\n(src/analytics/generate_report.py)\nInteraktywny raport Plotly HTML"]
-    T9["9. notify_power_automate\n(src/alerting/notify_power_automate.py)\nOcena progow -> Teams Adaptive Card JSON"]
+    T8["8. notify_power_automate\n(src/alerting/notify_power_automate.py)\nOcena progow MVP -> Teams Adaptive Card JSON"]
 
     T1 --> T2 --> T3 --> T4 --> T5 --> T6
     T6 -->|"CRITICAL FAIL"| STOP
-    T6 -->|"ALL CRITICAL PASS"| T7 --> T8 --> T9
+    T6 -->|"ALL CRITICAL PASS"| T7 --> T8
 ```
 
 *(Osobny DAG [tme_gus_backfill_chunked.py](../dags/tme_gus_backfill_chunked.py) jest domyślnie zapauzowany i służy wyłącznie do bezpiecznego, paczkowanego dogrywania wieloletniej historii `2019–2026` co 20 minut z poszanowaniem limitów API GUS.)*
 
 ---
 
-## 2. Co dokładnie dzieje się w każdym z 9 kroków?
+## 2. Co dokładnie dzieje się w każdym z 8 kroków?
 
 | Krok | Moduł Pythona | Co robi pod spodem | Zapisuje / aktualizuje |
 |---:|---|---|---|
@@ -38,11 +37,10 @@ flowchart TD
 | **2** | [sync_dictionaries.py](../src/pipelines/sync_dictionaries.py) | Pobiera słowniki okresów, miar, flag i pozycji z API DBW GUS, filtruje wyłącznie okresy miesięczne/narastające i dopisuje `business_code` z `config/trade_series_config.yml`. | `ref.dim_*` + backup słowników w Bronze S3 |
 | **3** | [discover_metadata.py](../src/pipelines/discover_metadata.py) | Sprawdza, czy każde ID w pliku YAML istnieje w słownikach `ref.*` i generuje audytowalny katalog metadanych. | [docs/gus_metadata_catalog.md](gus_metadata_catalog.md) |
 | **4** | [extract_trade.py](../src/pipelines/extract_trade.py) | Dla każdego zbioru i miesiąca sprawdza cache w Bronze S3; pobiera z GUS tylko brakujące lub ostatnie 3 miesiące (`recheck_recent_months: 3`). Dla NBP dociąga też rok bazowy (`min(years) - 1`). | Pliki `.json.gz` w S3 + `staging.fact_dbw_observation`, `staging.etl_revision_audit`, `staging.fact_nbp_fx` |
-| **5** | [build_marts.py](../src/pipelines/build_marts.py) | Buduje (jeśli nie istnieją) i odświeża bez blokowania odczytów 3 widoki zmaterializowane z plików `sql/02..04`. | `mart.mv_electronics_terms_of_trade`, `mart.mv_hub_intermediation_gap`, `mart.mv_export_market_pulse` |
+| **5** | [build_marts.py](../src/pipelines/build_marts.py) | Buduje (jeśli nie istnieją) i odświeża bez blokowania odczytów 3 widoki zmaterializowane (`sql/02..04`) oraz widok kalendarza `mart.dim_date` (`sql/06`). | `mart.mv_*` + `mart.dim_date` |
 | **6** | [run_dq.py](../src/quality/run_dq.py) | Uruchamia 7 reguł SQL z [dq_checks.sql](../data_quality/dq_checks.sql). Jeśli jakakolwiek reguła `CRITICAL` zwróci `failed_rows > 0`, przerywa DAG wyjątkiem `RuntimeError`. | Raport DQ w logach (bramka *Pass/Fail*) |
 | **7** | [models_fx_granger.py](../src/analytics/models_fx_granger.py) | Czyta widoki Gold, liczy regresję OLS (Newey-West HAC), korelacje z opóźnieniem `0–6m` i test Grangera (`1–6m`). | `mart.analytics_fx_regression`, `mart.analytics_lead_lag_granger` |
-| **8** | [generate_report.py](../src/analytics/generate_report.py) | Generuje samodzielny, interaktywny raport zarządczy HTML z 4 wykresami Plotly i tabelą regresji. | `reports/tme_export_sourcing_report.html` |
-| **9** | [notify_power_automate.py](../src/alerting/notify_power_automate.py) | Czyta najnowsze statusy z `mart.*`, ocenia progi alarmowe i wysyła JSON z kartą **Teams Adaptive Card v1.4** na `PA_WEBHOOK_URL` (lub zapisuje lokalnie w trybie dry-run). | `reports/last_power_automate_payload.json` (+ HTTP POST do Power Automate) |
+| **8** | [notify_power_automate.py](../src/alerting/notify_power_automate.py) | Czyta najnowsze statusy z `mart.*`, ocenia krytyczne progi MVP i wysyła JSON z kartą **Teams Adaptive Card v1.4** na `PA_WEBHOOK_URL` (lub zapisuje lokalnie w trybie dry-run). | `reports/last_power_automate_payload.json` (+ HTTP POST do Power Automate) |
 
 ---
 

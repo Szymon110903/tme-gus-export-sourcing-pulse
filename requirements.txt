@@ -20,9 +20,5 @@ statsmodels>=0.14.2
 SQLAlchemy>=2.0.30
 psycopg[binary]>=3.2.0
 
-# Reporting & Charts
-plotly>=5.22.0
-Jinja2>=3.1.4
-
 # Testing & Quality
 pytest>=8.2.0

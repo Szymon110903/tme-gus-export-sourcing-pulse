@@ -1,6 +1,6 @@
 # TME Export & Sourcing Pulse
 
-Automatyczny, produkcyjny potok analityczny (**Python 3.12 w Dockerze + Supabase PostgreSQL 16 + Supabase S3 Storage + Apache Airflow + Power BI / Plotly HTML + Power Automate / Power Apps**) zaprojektowany dla **Transfer Multisort Elektronik (TME)** — globalnego dystrybutora i eksportera komponentów elektronicznych oraz automatyki przemysłowej.
+Automatyczny, produkcyjny potok analityczny (**Python 3.12 w Dockerze + Supabase PostgreSQL 16 + Supabase S3 Storage + Apache Airflow + Power BI Desktop + Power Automate / Power Apps**) zaprojektowany dla **Transfer Multisort Elektronik (TME)** — globalnego dystrybutora i eksportera komponentów elektronicznych oraz automatyki przemysłowej.
 
 Rozwiązanie łączy oficjalne dane **API DBW GUS** (handel zagraniczny, ceny importu/eksportu wg PKWiU, wolumeny SITC 7, zamówienia eksportowe) z kursami walut **API NBP (EUR/PLN, USD/PLN)**, aby wcześnie wykrywać **presję marżową (*Terms of Trade*)**, **zmiany chłonności rynków eksportowych (UE vs CEE)** oraz **zależność sourcingową od hubów europejskich**.
 
@@ -59,10 +59,9 @@ docker compose run --rm etl python -m src.pipelines.discover_metadata
 docker compose run --rm etl python -m src.pipelines.extract_trade --backfill
 docker compose run --rm etl python -m src.pipelines.build_marts
 
-# 4. Data Quality Gates, modele statystyczne, raport HTML i alerting (dry-run)
+# 4. Data Quality Gates, modele statystyczne i alerting (dry-run)
 docker compose run --rm etl python -m src.quality.run_dq
 docker compose run --rm etl python -m src.analytics.models_fx_granger
-docker compose run --rm etl python -m src.analytics.generate_report
 docker compose run --rm etl python -m src.alerting.notify_power_automate --dry-run
 
 # 5. Testy jednostkowe i integracyjne (Supabase)
@@ -75,8 +74,11 @@ docker compose --profile airflow up -d --build
 # Panel WWW: http://localhost:8080 (admin / admin)
 ```
 Dostępne DAG-i w katalogu `dags/`:
-- **`tme_gus_export_sourcing_monthly`** ([dags/tme_gus_export_sourcing_monthly.py](dags/tme_gus_export_sourcing_monthly.py), `0 6 22 * *`) — docelowy potok produkcyjny uruchamiany 22. dnia miesiąca po publikacji biuletynu GUS (`init_db → sync_dictionaries → discover_metadata → extract_recent_window → build_marts → run_dq_gates → run_statistical_models → generate_html_report → notify_power_automate`).
+- **`tme_gus_export_sourcing_monthly`** ([dags/tme_gus_export_sourcing_monthly.py](dags/tme_gus_export_sourcing_monthly.py), `0 6 22 * *`) — docelowy potok produkcyjny uruchamiany 22. dnia miesiąca po publikacji biuletynu GUS (`init_db → sync_dictionaries → discover_metadata → extract_recent_window → build_marts → run_dq_gates → run_statistical_models → notify_power_automate`).
 - **`tme_gus_backfill_chunked`** ([dags/tme_gus_backfill_chunked.py](dags/tme_gus_backfill_chunked.py), `*/20 * * * *`, domyślnie zapauzowany) — bezpieczne dociąganie wieloletniej historii z poszanowaniem limitów API GUS.
+
+### Raportowanie BI (Power BI Desktop)
+Pakiet startowy (motyw TME, gotowe miary DAX oraz instrukcja połączenia z warstwą Gold w Supabase i budowy 3 stron dashboardu): [powerbi/README_powerbi.md](powerbi/README_powerbi.md).
 
 ---
 
@@ -94,18 +96,21 @@ Dostępne DAG-i w katalogu `dags/`:
 │   ├── data_model_and_cloud_storage.md # ERD (Mermaid) + Medallion na Supabase
 │   ├── gus_metadata_catalog.md         # Auto-generowany słownik metadanych GUS DBW
 │   └── power_platform_sap_mapping.md   # Power Automate, Power Apps i mapowanie na SAP
-├── reports/
-│   └── tme_export_sourcing_report.html # Interaktywny raport zarządczy (Plotly)
+├── powerbi/
+│   ├── README_powerbi.md               # Instrukcja podpięcia Power BI Desktop do Supabase
+│   ├── tme_theme.json                  # Motyw graficzny w stylu TME
+│   └── measures.dax                    # Gotowe miary DAX dla 3 stron raportu
 ├── sql/
 │   ├── 00_schemas_and_dicts.sql        # Schematy ref/staging/mart + wymiary
 │   ├── 01_staging_partitioned.sql      # Partycjonowana tabela faktów + audyt rewizji
 │   ├── 02_mart_electronics_tot.sql     # Gold: sektorowe Terms of Trade (PKWiU 26–28)
 │   ├── 03_mart_hub_intermediation_gap.sql # Gold: luka pośrednictwa hubów UE
 │   ├── 04_mart_export_market_pulse.sql # Gold: popyt eksportowy SITC 7 (UE vs CEE)
-│   └── 05_mart_analytics_tables.sql    # Gold: tabele wyników OLS HAC i Grangera
+│   ├── 05_mart_analytics_tables.sql    # Gold: tabele wyników OLS HAC i Grangera
+│   └── 06_mart_dim_date.sql            # Gold: wymiar kalendarza dla Power BI
 ├── src/
-│   ├── alerting/notify_power_automate.py # Reguły alarmowe + payload Teams Adaptive Card
-│   ├── analytics/                      # Modele OLS/Granger + generator raportu HTML
+│   ├── alerting/notify_power_automate.py # Reguły alarmowe MVP + Teams Adaptive Card
+│   ├── analytics/models_fx_granger.py  # Modele OLS HAC i testy Grangera
 │   ├── clients/                        # Klienci HTTP GUS DBW (retry/throttling) i NBP
 │   ├── core/                           # Ustawienia, połączenie PostgreSQL, S3 Bronze
 │   ├── pipelines/                      # Init DB, słowniki, ekstraktor, Gold marts
